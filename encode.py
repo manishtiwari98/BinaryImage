@@ -4,7 +4,11 @@ import math
 def convertToBinary(text):
 	encoded_string=''
 	for char in text:
-		encoded_string+=bin(ord(char))[-6:]
+		bin_text=bin(ord(char))[-7:]
+		if bin_text[0]=='b':
+		    bin_text='0'+bin_text[1:]
+		encoded_string+=bin_text
+		
 	return encoded_string
 
     
@@ -12,19 +16,24 @@ print("Enter Text To Encode:")
 txt=input().strip()
 data=convertToBinary(txt)
 length=len(data)
+
 nearest_sq=math.ceil(math.sqrt(length))
-print("nearest:",nearest_sq)
-size=math.floor(math.sqrt(400*400/length)) #	width x height	
-print("length is:",len(txt))
 
-sizeInBin=bin(len(txt))[2:]
-sizeInBin='0'*(16-len(sizeInBin))+sizeInBin
+#print("nearest:",nearest_sq)
+#size=math.floor(math.sqrt(400*400/length))  #width x height	
 
-im=Image.new('RGB',(500,500	),'white')
+size=int(400/nearest_sq)
+#print("length is:",len(txt))
+
+#converting lenghth of data to 16 digit binary, which will be used in decoding.......
+lengthInBin=bin(len(txt))[2:]
+lengthInBin='0'*(16-len(lengthInBin))+lengthInBin
+
+im=Image.new('RGB',(500,500),'white')
 draw=ImageDraw.Draw(im)
-print("size is:",size)	
+	
 end_len=int(400/size)
-print("end_len:",end_len)
+
 pos=0
 for rght in range(end_len):
     for dwn in range(end_len):	
@@ -34,19 +43,16 @@ for rght in range(end_len):
         if(data[pos]=='1'):
             draw.rectangle(cord,fill='black')
         pos+=1
+
+#Hiding data length....
 pixels=im.load()
 for rght in range(16):
-    if(sizeInBin[rght]=='0'):
+    if(lengthInBin[rght]=='0'):
         pixels[rght,399]=(255,255,254)
     else:
         pixels[rght,399]=(255,254,255)
     
 
 im.show()
-print("Do you want to save? Y/N")
-inp=input().strip()
-if(inp=="Y"):
-    im.save("file.png")
-    im.close()
-else:
-    im.close()
+im.save("file.png")
+im.close()	
